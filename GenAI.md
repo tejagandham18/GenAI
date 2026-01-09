@@ -197,4 +197,66 @@ Example (Chinese):
 ---
 
 
+# ⚙️ What is Parallelism?
+
+**Parallelism** refers to the ability of a system to process multiple tasks at the same time, instead of handling them one after another.  
+In modern AI, especially in transformer-based models, parallelism allows the model to process many tokens or data points simultaneously, which greatly improves speed and efficiency.
+
+---
+
+## 📘 Example: Grading Exam Papers
+
+Imagine there are **1,000 exam papers** that need to be graded.
+
+### **Sequential Approach (Old Way)**
+- One teacher grades all 1,000 papers alone
+- Papers are handled one-by-one
+- This takes a long time because each paper waits for the previous one
+
+### **Parallel Approach (Modern Way)**
+- The work is divided among **100 teachers**
+- Each teacher grades **10 papers at the same time**
+- The workload completes much faster because many papers are processed in parallel
+
+---
+
+## 🧠 Parallelism in AI Models
+
+This same idea applies in transformer-based AI models.
+
+Older models such as **RNNs and LSTMs** processed sentences **word-by-word**, meaning:
+
+
+This caused slower computation and delays because each step depended on the previous one.
+
+---
+
+## 🚀 Parallelism in Transformers
+
+Transformers introduced parallelism, allowing **all tokens in a sentence to be processed simultaneously**.
+
+Example sentence:
+
+> “Artificial intelligence is transforming the world.”
+
+Instead of reading each word one-by-one, transformers analyze **all words at once**, which helps the model learn relationships more effectively.
+
+This parallel processing makes modern AI models:
+- faster
+- more scalable
+- capable of handling larger datasets
+
+---
+
+## 🎯 Conclusion
+
+Parallelism is a major reason why modern Large Language Models (LLMs) such as:
+
+- GPT
+- BERT
+- Claude
+- Gemini
+
+are significantly faster and more capable than older sequential models.
+
 
