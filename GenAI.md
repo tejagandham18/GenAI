@@ -196,7 +196,5 @@ Example (Chinese):
 
 ---
 
-### 🔢 **Tokens Are Converted into Numbers**
 
-Example mapping:
 
