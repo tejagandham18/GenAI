@@ -260,7 +260,7 @@ Parallelism is a major reason why modern Large Language Models (LLMs) such as:
 are significantly faster and more capable than older sequential models.
 
 
-<p align="center"><b>Day 3</b></p>
+# 📅 **DAY 3**
 
 # What is Embedding?
 
