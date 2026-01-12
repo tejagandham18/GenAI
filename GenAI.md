@@ -260,3 +260,189 @@ Parallelism is a major reason why modern Large Language Models (LLMs) such as:
 are significantly faster and more capable than older sequential models.
 
 
+<p align="center"><b>Day 3</b></p>
+
+# What is Embedding?
+
+An **embedding** is a method of converting text into numerical vectors so that machines can understand and compare meaning. Since AI models cannot directly understand raw text, embeddings act as a **bridge** by representing words, sentences, or even documents in a mathematical form.
+
+Embeddings are powerful because they do not just store text, they **capture semantic meaning**. This means words or sentences with similar meanings will have embeddings that are close to each other, while unrelated concepts will be far apart.
+
+---
+
+## 📍 Example
+
+Consider the words:
+
+- “king”
+- “queen”
+- “apple”
+
+After embedding, they may convert into numerical vectors such as:
+
+
+Here, **king** and **queen** are close to each other in vector space because their meanings are related, while **apple** is far away since it is unrelated to royalty. This shows how embeddings capture **meaning**, not just spelling.
+
+Another everyday example with sentences:
+
+- “I am happy”
+- “I feel joyful”
+- “I am sad”
+
+“I am happy” and “I feel joyful” will be close to each other, while “I am sad” will be farther apart. Even though the words are different, the model understands similarity through embeddings.
+
+---
+
+## ⚙️ How Embeddings Work
+
+The process typically involves:
+
+1. **Tokenization** – breaking text into smaller units (tokens)
+2. **Token IDs** – converting tokens to numerical IDs
+3. **Vectorization** – converting those IDs into high-dimensional vectors
+
+Example:
+
+**Text:**
+
+
+**Tokens:**
+
+
+**Token IDs (illustrative):**
+
+
+**Embedding vectors:**
+
+
+---
+
+## 🎯 Why Embeddings Are Useful
+
+Embeddings allow AI systems to perform tasks such as:
+
+✔ semantic search  
+✔ question answering  
+✔ recommendation  
+✔ similarity detection  
+
+by comparing **meaning**, not just keywords.
+
+---
+
+## 🧠 Conclusion
+
+Embeddings **convert text into vectors that capture meaning**, enabling AI models to understand similarity and context. They are essential in modern search, chatbots, recommendation engines, and language models.
+
+
+# Embedding Sizes (Dimensions) in Popular Models
+
+## 1. OpenAI GPT Models (Embeddings API)
+
+OpenAI provides specific embedding models with fixed dimensions:
+
+| Model | Embedding Dimension | Notes |
+|---|---|---|
+| text-embedding-3-small | 384 | Light-weight, lower cost, good for general similarity/search |
+| text-embedding-3-large | 3072 | Higher accuracy, better for semantic search / knowledge retrieval |
+| text-embedding-ada-002 (legacy) | 1536 | Earlier embedding model used widely before text-embedding-3 |
+
+> **Note:** Higher dimension generally means richer representation (more detailed meaning), but also more storage and compute required.
+
+---
+
+## 2. Transformers from Hugging Face / BERT-type Models
+
+Many non-GPT models also have known embedding dimensions:
+
+| Model Family | Typical Embedding Dim | Notes |
+|---|---|---|
+| BERT-base | 768 | Standard encoder for classification/QA |
+| BERT-large | 1024 | Larger, more accurate |
+| RoBERTa-base | 768 | Improved training over BERT |
+| RoBERTa-large | 1024 | Better performance |
+| DistilBERT | 768 | Smaller, faster version |
+| Sentence-BERT (SBERT) | 768 / 1024 / custom | Specifically trained for sentence embeddings |
+
+---
+
+## 3. Multilingual Models
+
+Useful for many languages:
+
+| Model | Embedding Dim |
+|---|---|
+| mBERT (Multilingual BERT) | 768 |
+| XLM-RoBERTa-base | 768 |
+| XLM-RoBERTa-large | 1024 |
+
+---
+
+## 4. Vision + Multimodal Models
+
+Some models embed images, text, or both:
+
+| Model | Embedding Dim | Notes |
+|---|---|---|
+| CLIP (ViT-B/32) | 512 | Joint text-image embeddings |
+| CLIP (ViT-L/14) | 768 | Higher quality image-text alignments |
+| OpenAI Vision-capable | Varies | Depends on model architecture |
+
+---
+
+## How Embedding Dimension Works (Quick Explanation)
+
+Think of an embedding as a point in space — the more dimensions, the more subtle relationships it can encode.
+
+A **768-dimensional embedding** means each text unit becomes a vector of 768 numbers.
+
+A **3072-dimensional embedding** encodes more nuance but needs more compute.
+
+---
+
+## Example: Similarity Illustration
+
+Comparing:
+
+- “Apple is a fruit”
+- “Orange is a fruit”
+- “Computer is a device”
+
+Low dimension (384) roughly captures:
+
+- Apple ↔ Orange → small distance  
+- Apple ↔ Computer → large distance
+
+High dimension (3072) captures deeper semantics:
+
+- categories  
+- context usage  
+- synonyms  
+- relationships  
+
+---
+
+## Which Should You Use?
+
+### Use **larger dimensions (3072)** for:
+
+- Knowledge search
+- RAG systems
+- QA systems
+- Enterprise document retrieval
+
+### Use **smaller dimensions (384)** for:
+
+- Lightweight search
+- Clustering
+- Mobile / low-latency applications
+
+---
+
+## Short Interview Summary
+
+> **Embedding dimension** = number of numbers used to represent text as a vector.  
+> Higher dimensions capture more meaning (semantic richness) but cost more compute, while lower dimensions are faster and efficient.
+
+
+
