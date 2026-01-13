@@ -439,10 +439,5 @@ High dimension (3072) captures deeper semantics:
 
 ---
 
-## Short Interview Summary
-
-> **Embedding dimension** = number of numbers used to represent text as a vector.  
-> Higher dimensions capture more meaning (semantic richness) but cost more compute, while lower dimensions are faster and efficient.
-
 
 
