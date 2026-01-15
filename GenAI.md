@@ -439,5 +439,48 @@ High dimension (3072) captures deeper semantics:
 
 ---
 
+# 📘 Building a Chatbot Using Embeddings
+
+Imagine you have training videos and slideshow images filled with valuable information. A human can watch and read them and then answer questions — but your goal is to make a chatbot do the same.
+
+The first challenge is that the chatbot cannot “watch” or “look” at media the way we do. For the machine, videos are just pixels and sound, and slides are just images with no meaning. So the journey begins with making the media understandable.
+
+---
+
+## 🧩 Step 1 — Turning Media into Text
+
+We transcribe the video audio into text, and we extract the words from slides using OCR. Now all the content that was visually and audibly presented is converted into plain text — something a chatbot can read.
+
+---
+
+## 🧠 Step 2 — Giving Meaning to the Text
+
+However, just having text isn't enough. The chatbot still does not understand meaning. This is where embeddings come in.
+
+Embeddings convert each sentence into a numeric vector so that similar ideas end up close together. For example, “Inverter converts DC to AC” and “Direct current is transformed into alternating current” become neighbors in vector space. Meanwhile, unrelated sentences like “Apples grow on trees” are far away.
+
+---
+
+## 📦 Step 3 — Storing Knowledge for Retrieval
+
+All these embeddings are stored in a vector database. This allows the chatbot to search based on **meaning**, not matching exact words.
+
+---
+
+## 💬 Step 4 — User Asks a Question
+
+When the user asks, “How is AC power produced?”, the question is also embedded. The system then searches for the closest pieces of content in the vector database and retrieves the relevant chunks from your media.
+
+---
+
+## 🎓 Step 5 — Answering Like a Teacher
+
+Those retrieved chunks are sent to an LLM (like GPT), which reads them and forms a clear and accurate answer based on your content — just like a human who studied the material.
+
+---
+
+## 🌟 Final Outcome
+
+Through embeddings, the chatbot learns to connect your media content to the user’s questions and answer them intelligently. It doesn’t need to watch the video — it understands the extracted meaning.
 
 
