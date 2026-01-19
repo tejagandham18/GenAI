@@ -806,3 +806,164 @@ It turns RAG from a one-shot Q&A tool into a conversational assistant that can:
 ✔ answer truthfully  
 
 ---
+
+
+# ✂️ Text Chunking in RAG — Character vs Recursive Splitter
+
+This document explains how the given code splits text into chunks and why `RecursiveCharacterTextSplitter` is better for real-world RAG applications.
+
+---
+
+# 📍 1. Why Do We Split Text?
+
+In RAG systems, documents are divided into **chunks** so they can be:
+
+✔ embedded  
+✔ stored in a vector database  
+✔ retrieved efficiently  
+✔ fed to an LLM  
+
+Chunking quality directly affects retrieval accuracy.
+
+---
+
+# 📍 2. Input Text Used in the Example
+
+The example uses a mixed-format Tesla document:
+
+```
+Tesla's Q3 Results
+
+Tesla reported record revenue of $25.2B in Q3 2024.
+
+Model Y Performance
+
+The Model Y became the best-selling vehicle globally, with 350,000 units sold.
+
+Production Challenges
+
+Supply chain issues caused a 12% increase in production costs.
+
+This is one very long paragraph that definitely exceeds our 100 character limit and has no double newlines inside it whatsoever making it impossible to split properly.
+```
+
+This text contains:
+
+✔ headings  
+✔ paragraphs  
+✔ long unbroken sentences  
+
+which makes it ideal for testing chunking behavior.
+
+---
+
+# 📍 3. The Chunking Problem
+
+We set:
+
+```
+chunk_size = 100 characters
+```
+
+Meaning:
+
+> Each chunk must be ≤ 100 characters
+
+However, the last sentence is long and has **no clean break**, causing issues for naive splitting methods.
+
+---
+
+# 📍 4. CharacterTextSplitter (Naive Method)
+
+A basic splitter would look like:
+
+```python
+CharacterTextSplitter(
+    separator=" ",
+    chunk_size=100
+)
+```
+
+This splitter only splits by **spaces**, which fails when:
+
+❌ there are few spaces  
+❌ sentences exceed chunk_size  
+❌ no line breaks exist
+
+---
+
+# 📍 5. RecursiveCharacterTextSplitter (Smarter Method)
+
+The code uses:
+
+```python
+recursive_splitter = RecursiveCharacterTextSplitter(
+    separators=["\n\n", "\n", ". ", " ", ""],
+    chunk_size=100
+)
+```
+
+This defines a **priority list** of splitting rules:
+
+1. Try splitting by double newlines → `\n\n`
+2. If too long, split by newline → `\n`
+3. If too long, split by sentence → `. `
+4. If too long, split by words → ` `
+5. If still too long, split by characters → `""`
+
+This ensures chunk size is respected **without breaking meaning unnecessarily**.
+
+---
+
+# 📍 6. Why Recursive Splitting is Better
+
+### ❌ Basic splitter result:
+- Cuts text mid-sentence
+- Breaks words
+- Reduces semantic clarity
+- Hurts retrieval quality
+
+### ✔ Recursive splitter result:
+- Keeps semantic structure
+- Preserves sentences/phrases
+- Improves embedding quality
+- Increases RAG accuracy
+
+---
+
+# 📍 7. Example Chunk Output
+
+Output looks like:
+
+```
+Chunk 1: contains headings and Q3 results
+Chunk 2: contains Model Y sales info
+Chunk 3: contains supply chain issues
+Chunk 4: contains long paragraph split meaningfully
+```
+
+Each chunk is under **100 characters** and preserves context.
+
+---
+
+# 📍 8. Why This Matters in RAG
+
+Chunking directly affects:
+
+| Area | Impact |
+|---|---|
+| Retrieval | Better matching with user queries |
+| Embeddings | Higher semantic quality |
+| LLM Accuracy | More accurate factual answers |
+| Hallucination | Reduces hallucinations |
+| Latency | Efficient storage + search |
+
+Proper chunking = better QA performance.
+
+---
+
+# 📍 9. One-Line Summary
+
+> `RecursiveCharacterTextSplitter` tries multiple separators in order to create semantically meaningful, size-limited chunks—making it ideal for realistic RAG pipelines.
+
+---
