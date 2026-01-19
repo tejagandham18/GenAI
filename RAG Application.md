@@ -1529,4 +1529,171 @@ Different retrieval methods affect:
 
 > Retrieval choices determine which knowledge the LLM sees — and therefore what answer it can produce.
 
+--- 
+
+# 🔍 Multi-Query Retrieval in RAG — Clear Explanation
+
+This document explains how the provided code improves retrieval inside a RAG (Retrieval-Augmented Generation) pipeline using **multi-query reformulation**.
+
 ---
+
+# 📍 1. What Problem Is Being Solved?
+
+Users often ask questions in ways that **do not match how documents are written**.
+
+Example:
+
+User asks:
+> “How does Tesla make money?”
+
+Documents may say:
+- “Tesla generates revenue from…”
+- “Tesla’s business model includes…”
+- “Income streams include…”
+- “Profit sources include…”
+
+If we only search using the original question, we might miss relevant chunks.
+
+Multi-query retrieval solves this by asking the same question in multiple different ways.
+
+---
+
+# 📍 2. Main Idea
+
+The system performs three steps:
+
+```
+1. Generate multiple reformulations of the query (via LLM)
+2. Retrieve documents for each reformulated query
+3. Combine all results (later using RRF)
+```
+
+This increases the chance of retrieving all relevant information.
+
+---
+
+# 📍 3. Step-by-Step Breakdown
+
+---
+
+## **STEP 1 — User Query**
+
+```python
+original_query = "How does Tesla make money?"
+```
+
+This is the user’s natural question.
+
+---
+
+## **STEP 2 — LLM Generates Query Variations**
+
+The model is asked to rewrite the query in different ways while preserving meaning, e.g.:
+
+```
+1. What are Tesla’s revenue streams?
+2. How does Tesla generate income?
+3. What is Tesla’s business model for profit?
+```
+
+Each variation highlights a different vocabulary set:
+- “revenue”
+- “income”
+- “profit”
+- “business model”
+
+This helps match documents that use different wording.
+
+---
+
+## **STEP 3 — Perform Retrieval for Each Query**
+
+For each rewritten query:
+
+```
+Variation #1 → retrieve top 5 docs
+Variation #2 → retrieve top 5 docs
+Variation #3 → retrieve top 5 docs
+```
+
+These are then stored in:
+
+```python
+all_retrieval_results = [
+   docs_for_q1,
+   docs_for_q2,
+   docs_for_q3
+]
+```
+
+This forms a **retrieval pool**.
+
+---
+
+# 📍 4. Why Multi-Query Retrieval Works
+
+Because rewriting the query increases **recall** by reducing semantic mismatch.
+
+Example mismatch:
+
+User says:
+> “make money”
+
+Documents say:
+> “generate revenue”
+
+Without reformulation → retrieval may fail  
+With reformulation → retrieval succeeds
+
+---
+
+# 📍 5. What Happens Next (Fusion)
+
+Once all retrieval results are collected, they can be combined using:
+
+✔ **RRF — Reciprocal Rank Fusion** (most common)
+
+RRF promotes documents that appear across multiple ranked lists.
+
+Example:
+
+```
+Doc A appears in query 1 & 3 → high score
+Doc B appears in query 2 → medium score
+Doc C appears nowhere → ignored
+```
+
+---
+
+# 📍 6. Benefits of Multi-Query Retrieval
+
+| Benefit | Explanation |
+|---|---|
+| Higher Recall | Finds more relevant chunks |
+| Better Coverage | Covers different aspects of same question |
+| Less Missed Information | Reduces semantic mismatch |
+| Better RAG Answers | Gives LLM richer input |
+| Lower Hallucination | Grounded answers replace guesses |
+
+---
+
+# 📍 7. Real-World Usage
+
+This method is used in:
+
+✔ Microsoft Copilot  
+✔ Legal research bots  
+✔ Enterprise knowledge assistants  
+✔ Document Q&A systems  
+✔ Customer support AI  
+
+because business data is written in many different ways.
+
+---
+
+# 📍 8. One-Line Summary
+
+> Multi-query retrieval searches a user’s question in multiple reformulated ways so the system retrieves more relevant information, improving answer quality in RAG.
+
+---
+
