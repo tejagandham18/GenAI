@@ -967,3 +967,179 @@ Proper chunking = better QA performance.
 > `RecursiveCharacterTextSplitter` tries multiple separators in order to create semantically meaningful, size-limited chunks—making it ideal for realistic RAG pipelines.
 
 ---
+
+# 🧠 Semantic Chunking in RAG — Detailed Explanation
+
+This document explains how the provided code performs **semantic chunking**, and why it is useful in Retrieval-Augmented Generation (RAG) systems.
+
+---
+
+# 📍 1. Purpose of the Code
+
+The goal of this code is to split a document into **chunks based on meaning**, not based on:
+
+- character size  
+- punctuation  
+- line breaks  
+- formatting  
+
+Semantic chunking produces **topic-coherent** chunks that improve retrieval and answering accuracy in RAG pipelines.
+
+---
+
+# 📍 2. Input Text Structure
+
+The code uses a text example containing **three semantic topics**:
+
+```
+Tesla's Q3 Results
+Model Y Performance
+Production Challenges
+```
+
+Each contains multiple related sentences.
+
+These groups reflect how humans logically structure information.
+
+---
+
+# 📍 3. SemanticChunker Initialization
+
+```python
+semantic_splitter = SemanticChunker(
+    embeddings=OpenAIEmbeddings(),
+    breakpoint_threshold_type="percentile",
+    breakpoint_threshold_amount=70
+)
+```
+
+### Key parameters explained:
+
+| Parameter | Meaning |
+|---|---|
+| `OpenAIEmbeddings()` | Converts sentences → numeric vectors |
+| `breakpoint_threshold_type="percentile"` | Uses statistical break detection |
+| `breakpoint_threshold_amount=70` | Sets sensitivity at 70th percentile |
+
+---
+
+# 📍 4. How Semantic Chunking Works Internally
+
+SemanticChunker performs **four internal steps**:
+
+### **STEP A — Sentence Splitting**
+Document is split into individual sentences:
+```
+s1, s2, s3, s4, ...
+```
+
+### **STEP B — Embedding Calculation**
+Each sentence is converted into an embedding vector, e.g.:
+```
+s1 → [0.12, 0.55, 0.87, ...]
+```
+
+Sentences with similar meaning → close in vector space
+
+### **STEP C — Similarity Analysis**
+Cosine similarity is computed between adjacent sentences:
+
+```
+similarity(s1, s2)
+similarity(s2, s3)
+...
+```
+
+Similarity drop indicates topic change.
+
+### **STEP D — Breakpoint Detection**
+Using the 70th percentile threshold:
+
+> When similarity drops below threshold → start new chunk
+
+Example result:
+
+```
+[ Q3 Results block ]
+--- break ---
+[ Model Y block ]
+--- break ---
+[ Production Challenges block ]
+```
+
+---
+
+# 📍 5. Output Example
+
+The final output contains chunks such as:
+
+```
+Chunk 1:
+Tesla's Q3 Results...
+Revenue reports...
+Analyst expectations...
+
+Chunk 2:
+Model Y performance...
+350,000 units sold...
+Customer satisfaction 96%...
+
+Chunk 3:
+Production challenges...
+Supply chain issues...
+Cost increases...
+```
+
+Each chunk is **topic-coherent**.
+
+---
+
+# 📍 6. Why Semantic Chunking Is Better
+
+Compared to naive chunking:
+
+| Method | Splits By | Problem |
+|---|---|---|
+| Character-based | fixed size | breaks sentences |
+| Recursive | punctuation | structure-dependent |
+| Semantic | meaning | preserves concepts |
+
+Semantic chunking maintains **semantic integrity** which improves:
+
+✔ embedding quality  
+✔ retrieval accuracy  
+✔ LLM context understanding  
+✔ final answer quality  
+
+---
+
+# 📍 7. RAG Use Case Example
+
+User asks:
+
+> “How many Model Y units were sold?”
+
+### ❌ Naive chunking might return:
+
+```
+350,000 units sold.
+```
+
+### ✔ Semantic chunking returns full context:
+
+```
+Model Y became the best-selling vehicle globally,
+with 350,000 units sold.
+Customer satisfaction reached 96%...
+```
+
+This allows better grounding and richer answers.
+
+---
+
+# 📍 8. One-Line Summary
+
+> **SemanticChunker groups sentences by meaning using embeddings and statistical breakpoints, producing human-like topic chunks ideal for RAG systems.**
+
+---
+
