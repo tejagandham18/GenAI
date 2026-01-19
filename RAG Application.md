@@ -1320,3 +1320,213 @@ instead of just a fragment.
 > **Agentic chunking = LLM decides where to split text based on topic and meaning, producing human-quality chunks for RAG.**
 
 ---
+
+# 🔍 RAG Retrieval Methods — Detailed Explanation
+
+This document explains how the three retrieval strategies demonstrated in the code work, why they matter, and how they affect the behavior of a Retrieval-Augmented Generation (RAG) pipeline.
+
+---
+
+# 📍 1. Overview
+
+After documents are embedded and stored in a vector database (Chroma), the next step in a RAG pipeline is **retrieval**, which selects which chunks to pass to the LLM.
+
+This code demonstrates three retrieval techniques:
+
+```
+1. Top-K Similarity Search
+2. Similarity with Score Threshold
+3. Maximum Marginal Relevance (MMR)
+```
+
+Each method affects final LLM output quality differently.
+
+---
+
+# 📍 2. Setup Code
+
+```python
+persistent_directory = "db/chroma_db"
+embedding_model = OpenAIEmbeddings(model="text-embedding-3-small")
+
+db = Chroma(
+    persist_directory=persistent_directory,
+    embedding_function=embedding_model,
+    collection_metadata={"hnsw:space": "cosine"}
+)
+```
+
+This loads the vector database with:
+
+✔ stored embeddings  
+✔ stored document chunks  
+✔ cosine similarity index  
+
+---
+
+# 📍 3. Query
+
+```python
+query = "How much did Microsoft pay to acquire GitHub?"
+```
+
+This is the user question — the next steps determine how we retrieve relevant chunks for it.
+
+---
+
+# 📍 4. Method 1: Top-K Similarity Search
+
+```python
+retriever = db.as_retriever(search_kwargs={"k": 3})
+docs = retriever.invoke(query)
+```
+
+### ✔ What it does:
+
+Returns the **top K most similar** document chunks.
+
+Example:
+
+```
+Top 3 matches by cosine similarity
+```
+
+### ✔ Internal behavior:
+
+1. embed query
+2. compute cosine similarity
+3. rank chunks
+4. return top-k
+
+### ✔ Pros:
+
+- simplest retrieval method
+- fast and widely used
+
+### ❗ Cons:
+
+- may return redundant chunks
+- may include irrelevant chunks if k is too large
+
+---
+
+# 📍 5. Method 2: Similarity + Score Threshold (Optional)
+
+```python
+retriever = db.as_retriever(
+  search_type="similarity_score_threshold",
+  search_kwargs={"k": 3, "score_threshold": 0.3}
+)
+```
+
+### ✔ What it does:
+
+Same as Method 1, but filters results:
+
+> Only return chunks with similarity ≥ threshold
+
+### ✔ Benefits:
+
+- prevents irrelevant chunks from contaminating context
+- reduces hallucinations during generation
+
+### ❗ Possible downside:
+
+- may return fewer than k results
+- may return zero results if threshold too high
+
+---
+
+# 📍 6. Method 3: Max Marginal Relevance (MMR)
+
+```python
+retriever = db.as_retriever(
+  search_type="mmr",
+  search_kwargs={
+    "k": 3,
+    "fetch_k": 10,
+    "lambda_mult": 0.5
+  }
+)
+```
+
+### ✔ What it does:
+
+Balances:
+
+```
+relevance vs diversity
+```
+
+MMR ensures that retrieved documents are:
+
+- relevant to query
+- **not redundant** with each other
+
+### Example case:
+
+Without MMR:
+
+```
+sales
+sales
+sales
+```
+
+With MMR:
+
+```
+sales
+customer satisfaction
+production challenges
+```
+
+### 🔧 Parameters:
+
+| Parameter | Meaning |
+|---|---|
+| `k` | final num docs |
+| `fetch_k` | pool to choose from |
+| `lambda_mult` | relevance-diversity balance |
+
+`lambda_mult = 1.0` → all relevance  
+`lambda_mult = 0.0` → all diversity  
+`lambda_mult = 0.5` → balanced (recommended)
+
+### ✔ Benefits:
+
+- better contextual coverage
+- improves LLM answer quality
+- ideal for summarization + Q&A
+
+---
+
+# 📍 7. Why Retrieval Strategy Matters
+
+Different retrieval methods affect:
+
+| Factor | Impact |
+|---|---|
+| Relevance | Correct answers |
+| Diversity | Broader context |
+| Noise | Hallucination reduction |
+| Completeness | Multi-aspect coverage |
+| Factual grounding | Better outputs |
+
+---
+
+# 📍 8. Summary Comparison
+
+| Method | Strength | Weakness |
+|---|---|---|
+| Top-K Similarity | Simple & fast | Duplicate/irrelevant chunks |
+| Score Threshold | Filters noise | Might return too few |
+| MMR | Best coverage | Slightly slower |
+
+---
+
+# 📍 9. One-Line Summary
+
+> Retrieval choices determine which knowledge the LLM sees — and therefore what answer it can produce.
+
+---
