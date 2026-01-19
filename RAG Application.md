@@ -1697,3 +1697,195 @@ because business data is written in many different ways.
 
 ---
 
+# 🔍 Multi-Query + RRF Retrieval — Clear Explanation
+
+This document explains a retrieval pipeline that improves RAG performance by using **multiple reformulations of a query** and combining their results using **Reciprocal Rank Fusion (RRF)**.
+
+---
+
+# 1. Problem Being Solved
+
+Users often ask questions differently from how information is written in documents.
+
+Example:
+
+User asks:
+> "How does Tesla make money?"
+
+Documents may instead say:
+- "Tesla generates revenue from..."
+- "Income streams include..."
+- "Profit model includes..."
+- "Business model includes..."
+
+If retrieval only uses the user’s original question, relevant information may be missed.
+
+---
+
+# 2. Multi-Query Retrieval — Key Idea
+
+Instead of retrieving once, we:
+
+```
+1. Rewrite the query in different ways using an LLM
+2. Perform retrieval for each rewritten query
+3. Fuse the results
+```
+
+This increases the chances of finding relevant information.
+
+---
+
+# 3. Step-by-Step Pipeline
+
+---
+
+## **Step 1 — Original Query**
+
+```python
+original_query = "How does Tesla make money?"
+```
+
+---
+
+## **Step 2 — LLM Generates Query Variations**
+
+The LLM rewrites the original query into different forms:
+
+Example rewrites:
+```
+1. What are Tesla’s revenue streams?
+2. How does Tesla generate income?
+3. What is Tesla’s business model for profit?
+```
+
+These variations allow matching different vocabulary found in documents.
+
+---
+
+## **Step 3 — Retrieve Documents for Each Query**
+
+Each variation retrieves multiple relevant documents:
+
+Example:
+```
+Query 1 → Docs [A, B, C, D, E]
+Query 2 → Docs [B, F, G, H, I]
+Query 3 → Docs [A, J, K, D, L]
+```
+
+We collect all results in:
+
+```python
+all_retrieval_results = [...]
+```
+
+This forms a **retrieval pool**.
+
+---
+
+## **Step 4 — Reciprocal Rank Fusion (RRF)**
+
+RRF fuses multiple ranked lists.
+
+### RRF Intuition:
+
+Documents that appear multiple times across different queries are highly relevant.
+
+Example frequency:
+```
+Doc A → appears in Query 1 & 3
+Doc B → appears in Query 1 & 2
+Doc D → appears in Query 1 & 3
+Doc C → appears in Query 1 only
+```
+
+### RRF Formula:
+
+```
+Score = 1 / (k + rank_position)
+```
+
+Scores from all queries are summed.
+
+Chunks that consistently appear at higher ranks get stronger scores.
+
+---
+
+## **Step 5 — Final Ranked Result**
+
+After RRF fusion, we output:
+
+```
+Rank 1 → Doc A
+Rank 2 → Doc B
+Rank 3 → Doc D
+Rank 4 → Doc C
+...
+```
+
+This final ranking is superior to simple top-k retrieval.
+
+---
+
+# 4. Benefits of Multi-Query + RRF
+
+| Benefit | Description |
+|---|---|
+| Higher Recall | Finds more relevant chunks |
+| More Diversity | Covers more aspects |
+| Better Coverage | Captures different wording forms |
+| Less Hallucination | Better grounding for LLM answers |
+| Better Retrieval | Especially in enterprise RAG |
+
+---
+
+# 5. Real-World Usage
+
+This approach is used in:
+
+✔ Microsoft Copilot  
+✔ Legal Document Search  
+✔ Healthcare Q&A Systems  
+✔ Enterprise Knowledge Bases  
+✔ Customer Support Bots  
+
+because documents often describe the same concept using different language.
+
+---
+
+# 6. One-Line Summary
+
+> Instead of asking the question once, ask it multiple ways, retrieve multiple times, and merge the results using RRF for the best retrieval quality.
+
+---
+
+# 7. Final Diagram (High-Level Flow)
+
+```
+User Query
+      ↓
+LLM Generates Variations
+      ↓
+Multi-Query Retrieval
+      ↓
+Reciprocal Rank Fusion (RRF)
+      ↓
+Final Ranked Documents
+      ↓
+LLM Answering
+```
+
+---
+
+# 8. Why It Matters for RAG
+
+Retrieval quality directly impacts:
+
+✔ answer correctness  
+✔ factual grounding  
+✔ hallucination risk  
+
+Multi-query + RRF is considered **state-of-the-art retrieval** for RAG.
+
+---
