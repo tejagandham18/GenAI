@@ -190,3 +190,181 @@ This prepares all required data for RAG-based semantic Q&A, enterprise search, a
 
 ---
 
+#  **Retrieval pipeline**
+
+
+This document explains the retrieval stage of a RAG (Retrieval Augmented Generation) system based on the provided code.
+
+The retrieval pipeline is responsible for finding the most relevant information from stored documents before an LLM generates the answer.
+
+---
+
+# 📍 1. Purpose of Retrieval Stage
+
+Once documents have been ingested into a Vector Database, the retrieval stage does:
+
+```
+User Query → Vector Search → Relevant Context
+```
+
+Retrieval ensures that responses are based on real knowledge from documents instead of LLM hallucinations.
+
+---
+
+# 📍 2. Code Overview
+
+Key components used in the code:
+
+```python
+from langchain_chroma import Chroma
+from langchain_openai import OpenAIEmbeddings
+```
+
+Retrieval pipeline steps:
+
+1. Load VectorDB (Chroma)
+2. Embed the user query
+3. Perform similarity search
+4. Return the top relevant document chunks
+
+---
+
+# 📍 3. Step-by-Step Breakdown
+
+## **(1) Load Vector Store + Embeddings**
+
+```python
+embedding_model = OpenAIEmbeddings(model="text-embedding-3-small")
+
+db = Chroma(
+    persist_directory="db/chroma_db",
+    embedding_function=embedding_model,
+    collection_metadata={"hnsw:space": "cosine"}
+)
+```
+
+### 🧠 Internal Behavior:
+- Loads stored document embeddings from disk
+- Loads HNSW similarity index
+- Sets cosine similarity as search metric
+
+This allows the system to search documents efficiently.
+
+---
+
+## **(2) Prepare Query**
+
+```python
+query = "How much did Microsoft pay to acquire GitHub?"
+```
+
+This is the natural language question from the user.
+
+---
+
+## **(3) Execute Similarity Search**
+
+```python
+retriever = db.as_retriever(search_kwargs={"k": 5})
+relevant_docs = retriever.invoke(query)
+```
+
+This step finds the most similar chunks.
+
+### 🧠 Internal Breakdown:
+
+#### **Step A — Query Embedding**
+The query is converted into a vector:
+
+```
+[0.12, 0.56, 0.88, ...]
+```
+
+#### **Step B — Compare Against Stored Embeddings**
+Chroma computes cosine similarity between:
+
+```
+Query Vector ↔ Document Chunk Vectors
+```
+
+#### **Step C — Rank & Select**
+Returns top `k=5` chunks with highest similarity scores.
+
+This is the **retrieval** part of RAG.
+
+---
+
+## **Optional Threshold Filtering**
+
+```python
+retriever = db.as_retriever(
+    search_type="similarity_score_threshold",
+    search_kwargs={"k": 5, "score_threshold": 0.3}
+)
+```
+
+This filters out irrelevant chunks to reduce hallucination.
+
+---
+
+## **(4) Display Retrieved Context**
+
+```python
+for doc in relevant_docs:
+    print(doc.page_content)
+```
+
+This prints the text content of retrieved chunks.  
+These chunks are called **context**.
+
+---
+
+# 📍 4. Why Retrieval Matters in RAG
+
+Retrieval ensures:
+
+✔ factual answers  
+✔ evidence-based responses  
+✔ prevents hallucination  
+✔ supports private knowledge
+
+Without retrieval:
+
+LLM guesses and may answer incorrectly.
+
+With retrieval:
+
+LLM uses verified context from documents.
+
+---
+
+# 📍 5. Retrieval in Full RAG Workflow
+
+Retrieval sits between ingestion and generation:
+
+```
+(1) Ingestion
+      ↓
+(2) Retrieval ← (this code)
+      ↓
+(3) Generation (LLM final answer)
+```
+
+Retrieval provides the LLM with real context for answering questions.
+
+---
+
+# 📍 6. Final Summary (Simple)
+
+➡ **Execute Similarity Search** = find document chunks related to query  
+➡ **Display Context** = show those chunks for LLM usage
+
+Together:
+
+```
+User Query → Retrieved Context → LLM → Final Answer
+```
+
+This completes the retrieval stage of RAG.
+
+---
