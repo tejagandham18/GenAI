@@ -1,5 +1,8 @@
 # 🧠 Retrieval Augmented Generation (RAG) - How This Application Works
 
+#  **Ingestion pipeline**
+
+
 This document explains how the RAG application works based on the provided ingestion pipeline code.  
 The pipeline prepares documents for RAG usage by converting them into embeddings and storing them inside a vector database.
 
