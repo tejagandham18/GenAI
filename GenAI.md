@@ -646,3 +646,301 @@ You search “joy” → it finds books with the word **joy**
 You search “joy” → it finds books about **happiness, delight, festivals, celebrations**
 
 because those topics are **meaning related**.
+
+
+# 📦 RAG Modes Documentation
+
+## 📌 Overview
+
+This project implements multiple Retrieval-Augmented Generation (RAG) strategies to improve retrieval accuracy, reasoning capability, and response quality across multiple PDF documents.
+
+The system supports:
+
+- Standard RAG  
+- Speculative RAG  
+- Corrective RAG  
+- Fusion RAG (with Reciprocal Rank Fusion – RRF)  
+- Agentic RAG (LLM-based intent routing)  
+
+---
+
+# 🔎 What is RAG?
+
+Retrieval-Augmented Generation (RAG) is a technique that combines:
+
+1. Document retrieval from a vector database  
+2. Context injection into a Large Language Model (LLM)  
+3. Grounded answer generation  
+
+### Basic Flow
+
+```
+User Query → Retriever → LLM → Answer
+```
+
+---
+
+# 1️⃣ Standard RAG
+
+## Definition
+
+Standard RAG retrieves the top-K most relevant documents using vector similarity and generates an answer using that context.
+
+## Architecture
+
+```
+Query
+  ↓
+Vector Search (Top-K)
+  ↓
+Context
+  ↓
+LLM
+  ↓
+Answer
+```
+
+## Best Used For
+
+- General factual queries  
+- Product information lookup  
+- Basic document retrieval  
+
+## Example
+
+**Query:**  
+Tell me about ASUS laptops.
+
+---
+
+# 2️⃣ Speculative RAG
+
+## Definition
+
+Speculative RAG is designed for vague or exploratory queries.  
+It allows broader retrieval and flexible reasoning.
+
+## Architecture
+
+```
+Query
+  ↓
+Broader Retrieval
+  ↓
+Flexible Reasoning
+  ↓
+Answer
+```
+
+## Best Used For
+
+- Suggestions  
+- Recommendations  
+- Exploratory questions  
+- “Maybe”, “Suggest”, “Recommend” queries  
+
+## Example
+
+**Query:**  
+Suggest a good laptop for students.
+
+---
+
+# 3️⃣ Corrective RAG
+
+## Definition
+
+Corrective RAG focuses on high precision and strict factual correctness.  
+It minimizes hallucination by using narrow and exact retrieval.
+
+## Architecture
+
+```
+Query
+  ↓
+Precise Retrieval
+  ↓
+Strict Context Validation
+  ↓
+LLM
+  ↓
+Answer
+```
+
+## Best Used For
+
+- Exact price queries  
+- Exact specifications  
+- Model numbers  
+- Strict factual information  
+
+## Example
+
+**Query:**  
+What is the exact price of Dell XPS 15?
+
+---
+
+# 4️⃣ Fusion RAG (with RRF)
+
+## Definition
+
+Fusion RAG improves retrieval by:
+
+- Expanding the query into multiple variations  
+- Retrieving documents for each variation  
+- Combining results using Reciprocal Rank Fusion (RRF)  
+
+---
+
+## What is RRF?
+
+Reciprocal Rank Fusion (RRF) is a ranking algorithm:
+
+```
+Score = Σ 1 / (k + rank)
+```
+
+Where:
+- `rank` = position of document in each retrieval list  
+- `k` = smoothing constant  
+
+Documents appearing across multiple query results receive higher scores.
+
+---
+
+## Architecture
+
+```
+Query
+  ↓
+Query Expansion
+  ↓
+Multiple Retrievals
+  ↓
+RRF Ranking
+  ↓
+Top Ranked Documents
+  ↓
+LLM
+  ↓
+Answer
+```
+
+## Best Used For
+
+- Comparison queries  
+- “Best”, “Better”, “Difference”  
+- Multi-document reasoning  
+- Cross-PDF analysis  
+
+## Example
+
+**Query:**  
+Which laptop is best for gaming?
+
+---
+
+# 5️⃣ Agentic RAG
+
+## Definition
+
+Agentic RAG introduces a decision-making layer before retrieval.
+
+Instead of directly retrieving documents, the system:
+
+1. Uses an LLM to detect user intent  
+2. Selects the most appropriate RAG mode  
+3. Executes the selected mode  
+4. Generates the answer  
+
+---
+
+## Architecture
+
+```
+User Query
+   ↓
+Intent Detection (LLM)
+   ↓
+Select RAG Mode
+   ↓
+Execute Selected Mode
+   ↓
+Answer
+```
+
+---
+
+## Why It Is Called “Agentic”
+
+Because it follows an intelligent pattern:
+
+```
+Think → Decide → Act → Answer
+```
+
+The system behaves like an AI agent that dynamically selects the best strategy.
+
+---
+
+## Example
+
+**Query:**  
+Which laptop is best for gaming?
+
+Agent detects comparison intent → selects Fusion RAG → generates answer.
+
+---
+
+# 📊 RAG Modes Comparison
+
+| Mode        | Purpose | Best For |
+|------------|---------|----------|
+| Standard   | Basic retrieval | General queries |
+| Speculative| Suggestive reasoning | Recommendations |
+| Corrective | High precision | Exact factual queries |
+| Fusion     | Multi-query ranking | Comparison & analysis |
+| Agentic    | Intent-based routing | Intelligent automation |
+
+---
+
+# 🚀 Complete System Flow
+
+```
+User
+ ↓
+Agent (Intent Detection)
+ ↓
+Selected RAG Mode
+ ↓
+Retriever
+ ↓
+LLM
+ ↓
+Answer
+```
+
+---
+
+# 🎯 Key Takeaways
+
+- Standard RAG handles general queries.  
+- Speculative RAG handles exploratory questions.  
+- Corrective RAG ensures strict factual correctness.  
+- Fusion RAG improves ranking using RRF.  
+- Agentic RAG intelligently selects the best retrieval strategy using LLM-based intent detection.  
+
+---
+
+# 🏆 Conclusion
+
+This system demonstrates an advanced, modular RAG architecture with:
+
+- Multi-PDF retrieval  
+- Query expansion  
+- RRF ranking  
+- LLM-based intent routing  
+- Agentic decision-making  
+
+It represents a complete and extensible GenAI system.
